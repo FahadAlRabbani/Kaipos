@@ -7,4 +7,5 @@
     <string name="dialog_message_error">There was an error, try again.</string>
     <string name="dialog_ok_button">OK</string>
     <string name="network_unavailable_message">Network is unavailable</string>
+    <string name="no_location_detected">No location detected. Make sure location is enabled in your settings.</string>
 </resources>

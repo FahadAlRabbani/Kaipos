@@ -49,7 +49,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="60dp"
         android:textSize="24sp"
-        android:text="Alcatraz Island, CA"
+        android:text="Rochdale,UK"
         android:textColor="@android:color/white"/>
 
     <ImageView
@@ -59,7 +59,7 @@
         android:layout_alignBottom="@+id/locationLabel"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:src="@mipmap/cloudy_night"/>
+        android:src="@mipmap/clear_day"/>
 
     <LinearLayout
         android:orientation="horizontal"
@@ -134,4 +134,20 @@
         android:textColor="@android:color/white"
         android:gravity="center_horizontal"
         />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/refreshImageView"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:src="@mipmap/refresh"/>
+
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/progressBar"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_alignBottom="@+id/refreshImageView"/>
 </RelativeLayout>

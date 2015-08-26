@@ -2,15 +2,24 @@ package me.fahadalrabbani.kaipos;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
+import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
+import com.google.android.gms.location.LocationServices;
 import com.squareup.okhttp.Call;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.OkHttpClient;
@@ -25,10 +34,16 @@ import java.io.IOException;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements
+        ConnectionCallbacks, OnConnectionFailedListener  {
 
     private static final String TAG = MainActivity.class.getSimpleName();
+    private GoogleApiClient mGoogleApiClient;
+    private Location mLastLocation;
     private CurrentWeather mCurrentWeather;
+
+    private double lat = 53.3111577;
+    private double lng = -2.5439313;
 
     @Bind(R.id.timeLabel) TextView mTimeLabel;
     @Bind(R.id.temperatureLabel) TextView mTemperatureLabel;
@@ -36,18 +51,45 @@ public class MainActivity extends AppCompatActivity {
     @Bind(R.id.precipValue) TextView mPrecipValue;
     @Bind(R.id.summaryLabel) TextView mSummaryLabel;
     @Bind(R.id.iconImageView) ImageView mIconImageView;
+    @Bind(R.id.refreshImageView) ImageView mRefreshImageView;
+    @Bind(R.id.progressBar) ProgressBar mProgressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        buildGoogleApiClient();
 
+        mProgressBar.setVisibility(View.INVISIBLE);
+
+        mRefreshImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mGoogleApiClient != null) {
+                    getForecast(lat, lng);
+                }
+            }
+        });
+
+        if (mGoogleApiClient != null){
+            getForecast(lat, lng);
+        }
+    }
+
+    protected synchronized void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+    }
+
+    private void getForecast(double latitude, double longitude) {
         String API_KEY = "0f5adca66a91f9e4181805b9c68dae22";
-        double lat =  37.8267;
-        double lng = -122.423;
-        String forecastURL = "https://api.forecast.io/forecast/"+API_KEY+"/"+lat+","+lng;
+        String forecastURL = "https://api.forecast.io/forecast/"+API_KEY+"/"+latitude+","+longitude;
         if (isNetworkAvailable()) {
+            toggleRefresh();
             OkHttpClient client = new OkHttpClient();
 
             Request request = new Request.Builder().url(forecastURL).build();
@@ -56,14 +98,28 @@ public class MainActivity extends AppCompatActivity {
             call.enqueue(new Callback() {
                 @Override
                 public void onFailure(Request request, IOException e) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            toggleRefresh();
+                        }
+                    });
 
+                    alertUserAboutError();
                 }
 
                 @Override
                 public void onResponse(Response response) throws IOException {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            toggleRefresh();
+                        }
+                    });
+
                     try {
                         String jsonData = response.body().string();
-                        //Log.v(TAG, jsonData);
+
                         if (response.isSuccessful()) {
                             mCurrentWeather = getCurrentDetails(jsonData);
                             runOnUiThread(new Runnable() {
@@ -77,7 +133,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     } catch (IOException e) {
                         Log.e(TAG, "Exception: " + e);
-                    } catch (JSONException e){
+                    } catch (JSONException e) {
                         Log.e(TAG, "JSON Exception: " + e);
                     }
                 }
@@ -88,7 +144,17 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         } else {
-            Toast.makeText(this, R.string.network_unavailable_message,Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.network_unavailable_message, Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void toggleRefresh() {
+        if (mProgressBar.getVisibility() == View.INVISIBLE){
+            mProgressBar.setVisibility(View.VISIBLE);
+            mRefreshImageView.setVisibility(View.INVISIBLE);
+        } else {
+            mProgressBar.setVisibility(View.INVISIBLE);
+            mRefreshImageView.setVisibility(View.VISIBLE);
         }
     }
 
@@ -98,7 +164,8 @@ public class MainActivity extends AppCompatActivity {
         mHumidityValue.setText(mCurrentWeather.getHumidity() + "");
         mPrecipValue.setText(mCurrentWeather.getPrecipChance() + "%");
         mSummaryLabel.setText(mCurrentWeather.getSummary());
-        Drawable drawable = getResources().getDrawable(mCurrentWeather.getIconId());
+        //Drawable drawable = getResources().getDrawable(mCurrentWeather.getIconId());
+        Drawable drawable = ResourcesCompat.getDrawable(getResources(), mCurrentWeather.getIconId(), null);
         mIconImageView.setImageDrawable(drawable);
     }
 
@@ -132,5 +199,46 @@ public class MainActivity extends AppCompatActivity {
         return isAvailable;
     }
 
+    @Override
+    public void onConnected(Bundle bundle) {
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
 
+        if(mLastLocation != null){
+            lat = mLastLocation.getLatitude();
+            lng = mLastLocation.getLongitude();
+        } else {
+            Toast.makeText(this, R.string.no_location_detected, Toast.LENGTH_LONG).show();
+        }
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        Toast.makeText(this,"Connection failed: "+ connectionResult.getErrorCode(), Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mGoogleApiClient.connect();
+        getForecast(lat,lng);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.disconnect();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        getForecast(lat,lng);
+    }
 }
