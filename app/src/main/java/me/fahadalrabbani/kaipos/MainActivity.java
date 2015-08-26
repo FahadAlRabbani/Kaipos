@@ -41,9 +41,7 @@ public class MainActivity extends AppCompatActivity implements
     private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
     private CurrentWeather mCurrentWeather;
-
-    private double lat = 53.3111577;
-    private double lng = -2.5439313;
+    private UserCoordinates mUserCoordinates = new UserCoordinates();
 
     @Bind(R.id.timeLabel) TextView mTimeLabel;
     @Bind(R.id.temperatureLabel) TextView mTemperatureLabel;
@@ -53,6 +51,7 @@ public class MainActivity extends AppCompatActivity implements
     @Bind(R.id.iconImageView) ImageView mIconImageView;
     @Bind(R.id.refreshImageView) ImageView mRefreshImageView;
     @Bind(R.id.progressBar) ProgressBar mProgressBar;
+    @Bind(R.id.locationLabel) TextView mLocationLabel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,13 +66,13 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void onClick(View v) {
                 if (mGoogleApiClient != null) {
-                    getForecast(lat, lng);
+                    getForecast();
                 }
             }
         });
 
         if (mGoogleApiClient != null){
-            getForecast(lat, lng);
+            getForecast();
         }
     }
 
@@ -85,9 +84,10 @@ public class MainActivity extends AppCompatActivity implements
                 .build();
     }
 
-    private void getForecast(double latitude, double longitude) {
+    private void getForecast() {
+
         String API_KEY = "0f5adca66a91f9e4181805b9c68dae22";
-        String forecastURL = "https://api.forecast.io/forecast/"+API_KEY+"/"+latitude+","+longitude;
+        String forecastURL = "https://api.forecast.io/forecast/"+API_KEY+"/"+mUserCoordinates.getLatiude()+","+mUserCoordinates.getLongitude();
         if (isNetworkAvailable()) {
             toggleRefresh();
             OkHttpClient client = new OkHttpClient();
@@ -160,13 +160,14 @@ public class MainActivity extends AppCompatActivity implements
 
     private void updateDisplay() {
         mTemperatureLabel.setText(mCurrentWeather.getTemperature() + "");
-        mTimeLabel.setText("At "+ mCurrentWeather.getFormattedTime().toString() + " it will be");
+        mTimeLabel.setText("At "+ mCurrentWeather.getFormattedTime() + " it will be");
         mHumidityValue.setText(mCurrentWeather.getHumidity() + "");
         mPrecipValue.setText(mCurrentWeather.getPrecipChance() + "%");
         mSummaryLabel.setText(mCurrentWeather.getSummary());
         //Drawable drawable = getResources().getDrawable(mCurrentWeather.getIconId());
         Drawable drawable = ResourcesCompat.getDrawable(getResources(), mCurrentWeather.getIconId(), null);
         mIconImageView.setImageDrawable(drawable);
+        mLocationLabel.setText(mCurrentWeather.getTimeZone());
     }
 
     private CurrentWeather getCurrentDetails(String jsonData) throws JSONException {
@@ -204,8 +205,8 @@ public class MainActivity extends AppCompatActivity implements
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
 
         if(mLastLocation != null){
-            lat = mLastLocation.getLatitude();
-            lng = mLastLocation.getLongitude();
+            mUserCoordinates.setLatiude(mLastLocation.getLatitude());
+            mUserCoordinates.setLongitude(mLastLocation.getLongitude());
         } else {
             Toast.makeText(this, R.string.no_location_detected, Toast.LENGTH_LONG).show();
         }
@@ -225,7 +226,7 @@ public class MainActivity extends AppCompatActivity implements
     protected void onStart() {
         super.onStart();
         mGoogleApiClient.connect();
-        getForecast(lat,lng);
+        getForecast();
     }
 
     @Override
@@ -239,6 +240,6 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onResume() {
         super.onResume();
-        getForecast(lat,lng);
+        getForecast();
     }
 }
