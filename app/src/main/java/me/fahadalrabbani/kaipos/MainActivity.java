@@ -65,15 +65,11 @@ public class MainActivity extends AppCompatActivity implements
         mRefreshImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mGoogleApiClient != null) {
-                    getForecast();
-                }
+                getForecast();
             }
         });
 
-        if (mGoogleApiClient != null){
-            getForecast();
-        }
+        //getForecast();
     }
 
     protected synchronized void buildGoogleApiClient() {
@@ -95,6 +91,7 @@ public class MainActivity extends AppCompatActivity implements
             Request request = new Request.Builder().url(forecastURL).build();
 
             Call call = client.newCall(request);
+
             call.enqueue(new Callback() {
                 @Override
                 public void onFailure(Request request, IOException e) {
@@ -105,11 +102,12 @@ public class MainActivity extends AppCompatActivity implements
                         }
                     });
 
-                    alertUserAboutError();
+                    //alertUserAboutError();
                 }
 
                 @Override
                 public void onResponse(Response response) throws IOException {
+
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -128,8 +126,6 @@ public class MainActivity extends AppCompatActivity implements
                                     updateDisplay();
                                 }
                             });
-                        } else {
-                            alertUserAboutError();
                         }
                     } catch (IOException e) {
                         Log.e(TAG, "Exception: " + e);
@@ -207,6 +203,7 @@ public class MainActivity extends AppCompatActivity implements
         if(mLastLocation != null){
             mUserCoordinates.setLatiude(mLastLocation.getLatitude());
             mUserCoordinates.setLongitude(mLastLocation.getLongitude());
+            getForecast();
         } else {
             Toast.makeText(this, R.string.no_location_detected, Toast.LENGTH_LONG).show();
         }
@@ -235,11 +232,5 @@ public class MainActivity extends AppCompatActivity implements
         if (mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
         }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        getForecast();
     }
 }
