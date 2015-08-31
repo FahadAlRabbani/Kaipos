@@ -26,6 +26,7 @@ import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -36,6 +37,9 @@ import butterknife.ButterKnife;
 import me.fahadalrabbani.kaipos.R;
 import me.fahadalrabbani.kaipos.UserCoordinates;
 import me.fahadalrabbani.kaipos.weather.Current;
+import me.fahadalrabbani.kaipos.weather.Day;
+import me.fahadalrabbani.kaipos.weather.Forecast;
+import me.fahadalrabbani.kaipos.weather.Hour;
 
 public class MainActivity extends AppCompatActivity implements
         ConnectionCallbacks, OnConnectionFailedListener  {
@@ -43,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements
     private static final String TAG = MainActivity.class.getSimpleName();
     private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
-    private Current mCurrent;
+    private Forecast mForecast;
     private UserCoordinates mUserCoordinates = new UserCoordinates();
 
     @Bind(R.id.timeLabel) TextView mTimeLabel;
@@ -72,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements
             }
         });
 
-        //getForecast();
+        getForecast();
     }
 
     protected synchronized void buildGoogleApiClient() {
@@ -105,7 +109,7 @@ public class MainActivity extends AppCompatActivity implements
                         }
                     });
 
-                    //alertUserAboutError();
+
                 }
 
                 @Override
@@ -122,13 +126,15 @@ public class MainActivity extends AppCompatActivity implements
                         String jsonData = response.body().string();
 
                         if (response.isSuccessful()) {
-                            mCurrent = getCurrentDetails(jsonData);
+                            mForecast = parseForecastDetails(jsonData);
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
                                     updateDisplay();
                                 }
                             });
+                        } else {
+                            alertUserAboutError();
                         }
                     } catch (IOException e) {
                         Log.e(TAG, "Exception: " + e);
@@ -158,6 +164,8 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void updateDisplay() {
+        Current mCurrent = mForecast.getCurrent();
+
         mTemperatureLabel.setText(mCurrent.getTemperature() + "");
         mTimeLabel.setText("At "+ mCurrent.getFormattedTime() + " it will be");
         mHumidityValue.setText(mCurrent.getHumidity() + "");
@@ -167,6 +175,64 @@ public class MainActivity extends AppCompatActivity implements
         Drawable drawable = ResourcesCompat.getDrawable(getResources(), mCurrent.getIconId(), null);
         mIconImageView.setImageDrawable(drawable);
         mLocationLabel.setText(mCurrent.getTimeZone());
+    }
+
+    private Forecast parseForecastDetails(String jsonData) throws JSONException {
+        Forecast forecast = new Forecast();
+
+        forecast.setCurrent(getCurrentDetails(jsonData));
+        forecast.setHourlyForecast(getHouryForecast(jsonData));
+        forecast.setDailyForecast(getDailyForecast(jsonData));
+
+        return forecast;
+    }
+
+    private Hour[] getHouryForecast(String jsonData) throws JSONException {
+        JSONObject forecast = new JSONObject(jsonData);
+        String timezone = forecast.getString("timezone");
+        JSONObject hourly = forecast.getJSONObject("hourly");
+        JSONArray data = hourly.getJSONArray("data");
+
+        Hour[] hours = new Hour[data.length()];
+
+        for (int i = 0; i < data.length(); i++) {
+
+            JSONObject jsonHour = data.getJSONObject(i);
+            Hour hour = new Hour();
+
+            hour.setSummary(jsonHour.getString("summary"));
+            hour.setIcon(jsonHour.getString("icon"));
+            hour.setTemperature(jsonHour.getDouble("temperature"));
+            hour.setTime(jsonHour.getInt("time"));
+            hour.setTimezone(timezone);
+
+            hours[i] = hour;
+        }
+        return hours;
+    }
+
+    private Day[] getDailyForecast(String jsonData) throws JSONException{
+        JSONObject forecast = new JSONObject(jsonData);
+        String timezone = forecast.getString("timezone");
+        JSONObject daily = forecast.getJSONObject("daily");
+        JSONArray data = daily.getJSONArray("data");
+
+        Day[] days = new Day[data.length()];
+
+        for (int i = 0; i < data.length(); i++) {
+            JSONObject jsonDay = data.getJSONObject(i);
+
+            Day day = new Day();
+
+            day.setTimezone(timezone);
+            day.setSummary(jsonDay.getString("summary"));
+            day.setTime(jsonDay.getInt("time"));
+            day.setIcon(jsonDay.getString("icon"));
+            day.setTemperatureMax(jsonDay.getDouble("temperatureMax"));
+
+            days[i] = day;
+        }
+        return days;
     }
 
     private Current getCurrentDetails(String jsonData) throws JSONException {
@@ -206,7 +272,6 @@ public class MainActivity extends AppCompatActivity implements
         if(mLastLocation != null){
             mUserCoordinates.setLatiude(mLastLocation.getLatitude());
             mUserCoordinates.setLongitude(mLastLocation.getLongitude());
-            getForecast();
         } else {
             Toast.makeText(this, R.string.no_location_detected, Toast.LENGTH_LONG).show();
         }
