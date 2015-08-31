@@ -1,10 +1,12 @@
-package me.fahadalrabbani.kaipos;
+package me.fahadalrabbani.kaipos.ui;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.os.Bundle;
+
+import me.fahadalrabbani.kaipos.R;
 
 /**
  * Created by achernar on 21/08/15.

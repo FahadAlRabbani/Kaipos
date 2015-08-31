@@ -1,13 +1,15 @@
-package me.fahadalrabbani.kaipos;
+package me.fahadalrabbani.kaipos.weather;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
+import me.fahadalrabbani.kaipos.R;
+
 /**
  * Created by achernar on 25/08/15.
  */
-public class CurrentWeather {
+public class Current {
 
     private String mIcon;
     private long mTime;
