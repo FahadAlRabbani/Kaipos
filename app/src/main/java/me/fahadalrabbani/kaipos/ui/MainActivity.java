@@ -46,7 +46,6 @@ public class MainActivity extends AppCompatActivity implements
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private GoogleApiClient mGoogleApiClient;
-    private Location mLastLocation;
     private Forecast mForecast;
     private UserCoordinates mUserCoordinates = new UserCoordinates();
 
@@ -76,7 +75,6 @@ public class MainActivity extends AppCompatActivity implements
             }
         });
 
-        getForecast();
     }
 
     protected synchronized void buildGoogleApiClient() {
@@ -108,8 +106,7 @@ public class MainActivity extends AppCompatActivity implements
                             toggleRefresh();
                         }
                     });
-
-
+                    alertUserAboutError();
                 }
 
                 @Override
@@ -134,7 +131,7 @@ public class MainActivity extends AppCompatActivity implements
                                 }
                             });
                         } else {
-                            alertUserAboutError();
+                            //alertUserAboutError();
                         }
                     } catch (IOException e) {
                         Log.e(TAG, "Exception: " + e);
@@ -267,11 +264,12 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onConnected(Bundle bundle) {
-        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
 
-        if(mLastLocation != null){
-            mUserCoordinates.setLatiude(mLastLocation.getLatitude());
-            mUserCoordinates.setLongitude(mLastLocation.getLongitude());
+        if(lastLocation != null){
+            mUserCoordinates.setLatiude(lastLocation.getLatitude());
+            mUserCoordinates.setLongitude(lastLocation.getLongitude());
+            getForecast();
         } else {
             Toast.makeText(this, R.string.no_location_detected, Toast.LENGTH_LONG).show();
         }
