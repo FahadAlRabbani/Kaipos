@@ -1,6 +1,7 @@
 package me.fahadalrabbani.kaipos.ui;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.net.ConnectivityManager;
@@ -34,6 +35,7 @@ import java.io.IOException;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import me.fahadalrabbani.kaipos.R;
 import me.fahadalrabbani.kaipos.UserCoordinates;
 import me.fahadalrabbani.kaipos.weather.Current;
@@ -131,7 +133,7 @@ public class MainActivity extends AppCompatActivity implements
                                 }
                             });
                         } else {
-                            //alertUserAboutError();
+                            alertUserAboutError();
                         }
                     } catch (IOException e) {
                         Log.e(TAG, "Exception: " + e);
@@ -298,5 +300,10 @@ public class MainActivity extends AppCompatActivity implements
         if (mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
         }
+    }
+    @OnClick (R.id.dailyButton)
+    public void startDailyForecastActivity(){
+        Intent intent = new Intent(this, DailyForecastActivity.class);
+        startActivity(intent)   ;
     }
 }
