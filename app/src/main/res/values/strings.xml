@@ -11,4 +11,6 @@
 
     <string name="hello_world">Hello world!</string>
     <string name="no_data_forecast_data">There is no data to display</string>
+    <string name="icon_image_description">Icon Image</string>
+    <string name="circle_image_description">Circle Image</string>
 </resources>
