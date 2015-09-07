@@ -43,10 +43,14 @@ import me.fahadalrabbani.kaipos.weather.Day;
 import me.fahadalrabbani.kaipos.weather.Forecast;
 import me.fahadalrabbani.kaipos.weather.Hour;
 
+
+
 public class MainActivity extends AppCompatActivity implements
         ConnectionCallbacks, OnConnectionFailedListener  {
 
     private static final String TAG = MainActivity.class.getSimpleName();
+    public static final String DAILY_FORECAST = "DAILY_FORECAST";
+
     private GoogleApiClient mGoogleApiClient;
     private Forecast mForecast;
     private UserCoordinates mUserCoordinates = new UserCoordinates();
@@ -132,8 +136,6 @@ public class MainActivity extends AppCompatActivity implements
                                     updateDisplay();
                                 }
                             });
-                        } else {
-                            alertUserAboutError();
                         }
                     } catch (IOException e) {
                         Log.e(TAG, "Exception: " + e);
@@ -301,9 +303,11 @@ public class MainActivity extends AppCompatActivity implements
             mGoogleApiClient.disconnect();
         }
     }
+
     @OnClick (R.id.dailyButton)
     public void startDailyForecastActivity(){
         Intent intent = new Intent(this, DailyForecastActivity.class);
-        startActivity(intent)   ;
+        intent.putExtra(DAILY_FORECAST,mForecast.getDailyForecast());
+        startActivity(intent);
     }
 }
