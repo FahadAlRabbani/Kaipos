@@ -29,6 +29,15 @@
         <activity
             android:name=".ui.DailyForecastActivity"
             android:label="@string/title_activity_daily_forecast"
+            android:parentActivityName=".ui.MainActivity"
+            android:screenOrientation="portrait" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="me.fahadalrabbani.kaipos.ui.MainActivity" />
+        </activity>
+        <activity
+            android:name=".ui.HourlyForecastActivity"
+            android:label="@string/title_activity_hourly_forecast"
             android:parentActivityName=".ui.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

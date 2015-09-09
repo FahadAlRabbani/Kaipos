@@ -37,7 +37,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import me.fahadalrabbani.kaipos.R;
-import me.fahadalrabbani.kaipos.UserCoordinates;
+import me.fahadalrabbani.kaipos.location.UserCoordinates;
 import me.fahadalrabbani.kaipos.weather.Current;
 import me.fahadalrabbani.kaipos.weather.Day;
 import me.fahadalrabbani.kaipos.weather.Forecast;
@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private static final String TAG = MainActivity.class.getSimpleName();
     public static final String DAILY_FORECAST = "DAILY_FORECAST";
+    public static final String HOURLY_FORECAST = "HOURLY_FORECAST";
 
     private GoogleApiClient mGoogleApiClient;
     private Forecast mForecast;
@@ -305,9 +306,16 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @OnClick (R.id.dailyButton)
-    public void startDailyForecastActivity(){
+    public void startDailyForecastActivity(View view){
         Intent intent = new Intent(this, DailyForecastActivity.class);
         intent.putExtra(DAILY_FORECAST,mForecast.getDailyForecast());
+        startActivity(intent);
+    }
+
+    @OnClick (R.id.hourlyButton)
+    public void startHourlyForecastActivity(View view){
+        Intent intent = new Intent(this, HourlyForecastActivity.class);
+        intent.putExtra(HOURLY_FORECAST,mForecast.getHourlyForecast());
         startActivity(intent);
     }
 }

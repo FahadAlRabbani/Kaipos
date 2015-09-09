@@ -1,4 +1,4 @@
-package me.fahadalrabbani.kaipos;
+package me.fahadalrabbani.kaipos.location;
 
 /**
  *
