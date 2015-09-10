@@ -55,7 +55,7 @@ public class Current {
     }
 
     public int getTemperature() {
-        return (int) Math.floor(mTemperature);
+        return (int) Math.floor((mTemperature-32)*5/9);
     }
 
     public void setTemperature(double temperature) {
