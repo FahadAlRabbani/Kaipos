@@ -168,10 +168,10 @@ public class MainActivity extends AppCompatActivity implements
     private void updateDisplay() {
         Current mCurrent = mForecast.getCurrent();
 
-        mTemperatureLabel.setText(mCurrent.getTemperature() + "");
-        mTimeLabel.setText("At "+ mCurrent.getFormattedTime() + " it will be");
-        mHumidityValue.setText(mCurrent.getHumidity() + "");
-        mPrecipValue.setText(mCurrent.getPrecipChance() + "%");
+        mTemperatureLabel.setText(String.format("%d", mCurrent.getTemperature()));
+        mTimeLabel.setText(String.format("At %s it will be", mCurrent.getFormattedTime()));
+        mHumidityValue.setText(String.format("%s", mCurrent.getHumidity()));
+        mPrecipValue.setText(String.format("%d%%", mCurrent.getPrecipChance()));
         mSummaryLabel.setText(mCurrent.getSummary());
         //Drawable drawable = getResources().getDrawable(mCurrent.getIconId());
         Drawable drawable = ResourcesCompat.getDrawable(getResources(), mCurrent.getIconId(), null);
@@ -251,8 +251,6 @@ public class MainActivity extends AppCompatActivity implements
         current.setSummary(currently.getString("summary"));
         current.setTemperature(currently.getDouble("temperature"));
         current.setTimeZone(timezone);
-
-        Log.d(TAG, current.getFormattedTime());
 
         return current;
     }

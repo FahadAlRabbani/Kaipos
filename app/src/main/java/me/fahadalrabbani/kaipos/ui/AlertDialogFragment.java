@@ -10,6 +10,7 @@ import me.fahadalrabbani.kaipos.R;
 
 /**
  * Created by achernar on 21/08/15.
+ * AlertDialogFragement
  */
 public class AlertDialogFragment extends DialogFragment {
 

@@ -13,6 +13,7 @@ import me.fahadalrabbani.kaipos.weather.Day;
 
 /**
  * Created by achernar on 06/09/15.
+ * DayAdapter Class
  */
 public class DayAdapter  extends BaseAdapter {
 
@@ -57,9 +58,11 @@ public class DayAdapter  extends BaseAdapter {
         Day day = mDays[position];
 
         holder.iconImageView.setImageResource(day.getIconId());
-        holder.temperatureLabel.setText(day.getTemperatureMax()+ "");
+        holder.temperatureLabel.setText(String.format("%d", day.getTemperatureMax()));
         if (position == 0){
-            holder.dayLabel.setText("Today");
+            holder.dayLabel.setText(R.string.day_today);
+        } else if(position == 1) {
+            holder.dayLabel.setText(R.string.day_tomorrow);
         } else {
         holder.dayLabel.setText(day.getDayOfTheWeek());
         }

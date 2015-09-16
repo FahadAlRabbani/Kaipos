@@ -13,5 +13,16 @@
         android:layout_height="match_parent"
         android:id="@+id/recyclerView"
 
+        android:layout_below="@+id/theHourlyLabel"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/hourly_textView_label"
+        android:id="@+id/theHourlyLabel"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:textColor="#ffffffff"
+        android:textSize="30sp"
+        android:layout_marginTop="16dp"
         />
 </RelativeLayout>

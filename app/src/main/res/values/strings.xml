@@ -15,4 +15,7 @@
     <string name="circle_image_description">Circle Image</string>
     <string name="this_week_weather_label">This Week\'s Weather</string>
     <string name="title_activity_hourly_forecast">HourlyForecastActivity</string>
+    <string name="day_tomorrow">Tomorrow</string>
+    <string name="day_today">Today</string>
+    <string name="hourly_textView_label">24 Hour Weather</string>
 </resources>

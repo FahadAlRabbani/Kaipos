@@ -1,23 +1,28 @@
 package me.fahadalrabbani.kaipos.adapters;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import me.fahadalrabbani.kaipos.R;
 import me.fahadalrabbani.kaipos.weather.Hour;
 
 /**
  * Created by achernar on 10/09/15.
+ * HourAdapter Class
  */
 public class HourAdapter extends RecyclerView.Adapter<HourAdapter.HourViewHolder> {
 
     private Hour[] mHours;
+    private Context mContext;
 
-    public HourAdapter(Hour[] hours){
+    public HourAdapter(Context context ,Hour[] hours){
+        mContext = context;
         mHours = hours;
     }
 
@@ -31,7 +36,6 @@ public class HourAdapter extends RecyclerView.Adapter<HourAdapter.HourViewHolder
     @Override
     public void onBindViewHolder(HourViewHolder hourViewHolder, int position) {
         hourViewHolder.bindHour(mHours[position]);
-
     }
 
     @Override
@@ -39,7 +43,7 @@ public class HourAdapter extends RecyclerView.Adapter<HourAdapter.HourViewHolder
         return mHours.length;
     }
 
-    public class HourViewHolder extends RecyclerView.ViewHolder {
+    public class HourViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
 
         TextView mTimeLabel;
@@ -54,13 +58,24 @@ public class HourAdapter extends RecyclerView.Adapter<HourAdapter.HourViewHolder
             mTemperatureLabel = (TextView) itemView.findViewById(R.id.temperatureLabel2);
             mIconImageView = (ImageView) itemView.findViewById(R.id.iconImageView2);
 
+            itemView.setOnClickListener(this);
         }
 
         public void bindHour(Hour hour){
             mTimeLabel.setText(hour.getHour());
             mSummaryLabel.setText(hour.getSummary());
-            mTemperatureLabel.setText(hour.getTemperature()+"˚");
+            mTemperatureLabel.setText(String.format("%s˚", String.valueOf(hour.getTemperature())));
             mIconImageView.setImageResource(hour.getIconId());
+        }
+
+        @Override
+        public void onClick(View v) {
+            String time = mTimeLabel.getText().toString();
+            String temp = mTemperatureLabel.getText().toString();
+            String summary = mSummaryLabel.getText().toString().toLowerCase();
+            String message = String.format("At %s it will be %s and %s.",time,temp,summary);
+
+            Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show();
         }
     }
 }

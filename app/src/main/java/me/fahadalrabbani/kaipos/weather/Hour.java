@@ -8,6 +8,7 @@ import java.util.Date;
 
 /**
  * Created by achernar on 31/08/15.
+ * Hour
  */
 public class Hour implements Parcelable {
 
