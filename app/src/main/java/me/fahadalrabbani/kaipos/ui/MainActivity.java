@@ -82,6 +82,8 @@ public class MainActivity extends AppCompatActivity implements
             }
         });
 
+
+
     }
 
     protected synchronized void buildGoogleApiClient() {

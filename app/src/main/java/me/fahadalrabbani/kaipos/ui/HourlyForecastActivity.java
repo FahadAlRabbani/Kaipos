@@ -38,7 +38,5 @@ public class HourlyForecastActivity extends AppCompatActivity {
         mRecyclerView.setLayoutManager(layoutManager);
 
         mRecyclerView.setHasFixedSize(true);
-
-
     }
 }
