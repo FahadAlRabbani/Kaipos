@@ -6,7 +6,7 @@ package me.fahadalrabbani.kaipos.location;
  *
  */
 public class UserCoordinates {
-    private Double latiude;
+    private Double latitude;
     private Double longitude;
 
     public Double getLongitude() {
@@ -17,12 +17,12 @@ public class UserCoordinates {
         this.longitude = longitude;
     }
 
-    public Double getLatiude() {
-        return latiude;
+    public Double getLatitude() {
+        return latitude;
     }
 
-    public void setLatiude(Double latiude) {
-        this.latiude = latiude;
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
     }
 
 

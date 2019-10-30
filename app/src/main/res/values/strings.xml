@@ -18,4 +18,16 @@
     <string name="day_tomorrow">Tomorrow</string>
     <string name="day_today">Today</string>
     <string name="hourly_textView_label">24 Hour Weather</string>
+    <string name="hourly__label">Hourly</string>
+    <string name="weekly_label">Weekly</string>
+    <string name="double_dash_placeholder">--</string>
+    <string name="dots_placeholder">...</string>
+    <string name="refresh_button">Refresh button</string>
+    <string name="weather_logo_icon">Weather logo icon</string>
+    <string name="temperature_symbol">Temperature symbol</string>
+    <string name="loading">Loading</string>
+    <string name="getting_current_weather">Getting current weather...</string>
+    <string name="rain_snow">RAIN/SNOW?</string>
+    <string name="humidity">HUMIDITY</string>
+    <string name="dark_sky">Powered by Dark Sky</string>
 </resources>

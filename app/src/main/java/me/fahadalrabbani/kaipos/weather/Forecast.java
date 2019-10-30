@@ -36,7 +36,7 @@ public class Forecast {
         mDailyForecast = dailyForecast;
     }
 
-    public static int getIconId(String iconString){
+    static int getIconId(String iconString){
 
         //clear-day, clear-night, rain, snow, sleet, wind, fog, cloudy, partly-cloudy-day, or partly-cloudy-night
         int iconId = R.mipmap.clear_day;

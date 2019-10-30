@@ -7,14 +7,15 @@ import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.support.v4.content.res.ResourcesCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.res.ResourcesCompat;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -43,10 +44,11 @@ import me.fahadalrabbani.kaipos.weather.Day;
 import me.fahadalrabbani.kaipos.weather.Forecast;
 import me.fahadalrabbani.kaipos.weather.Hour;
 
+import static com.google.android.gms.location.LocationServices.FusedLocationApi;
 
 
 public class MainActivity extends AppCompatActivity implements
-        ConnectionCallbacks, OnConnectionFailedListener  {
+        ConnectionCallbacks, OnConnectionFailedListener {
 
     public static final String TAG = MainActivity.class.getSimpleName();
     public static final String DAILY_FORECAST = "DAILY_FORECAST";
@@ -56,15 +58,24 @@ public class MainActivity extends AppCompatActivity implements
     private Forecast mForecast;
     private UserCoordinates mUserCoordinates = new UserCoordinates();
 
-    @Bind(R.id.timeLabel) TextView mTimeLabel;
-    @Bind(R.id.temperatureLabel) TextView mTemperatureLabel;
-    @Bind(R.id.humidityValue)  TextView mHumidityValue;
-    @Bind(R.id.precipValue) TextView mPrecipValue;
-    @Bind(R.id.summaryLabel) TextView mSummaryLabel;
-    @Bind(R.id.iconImageView) ImageView mIconImageView;
-    @Bind(R.id.refreshImageView) ImageView mRefreshImageView;
-    @Bind(R.id.progressBar) ProgressBar mProgressBar;
-    @Bind(R.id.locationLabel) TextView mLocationLabel;
+    @Bind(R.id.timeLabel)
+    TextView mTimeLabel;
+    @Bind(R.id.temperatureLabel)
+    TextView mTemperatureLabel;
+    @Bind(R.id.humidityValue)
+    TextView mHumidityValue;
+    @Bind(R.id.precipValue)
+    TextView mPrecipValue;
+    @Bind(R.id.summaryLabel)
+    TextView mSummaryLabel;
+    @Bind(R.id.iconImageView)
+    ImageView mIconImageView;
+    @Bind(R.id.refreshImageView)
+    ImageView mRefreshImageView;
+    @Bind(R.id.progressBar)
+    ProgressBar mProgressBar;
+    @Bind(R.id.locationLabel)
+    TextView mLocationLabel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,9 +92,6 @@ public class MainActivity extends AppCompatActivity implements
                 getForecast();
             }
         });
-
-
-
     }
 
     protected synchronized void buildGoogleApiClient() {
@@ -97,7 +105,7 @@ public class MainActivity extends AppCompatActivity implements
     private void getForecast() {
 
         String API_KEY = "0f5adca66a91f9e4181805b9c68dae22";
-        String forecastURL = "https://api.forecast.io/forecast/"+API_KEY+"/"+mUserCoordinates.getLatiude()+","+mUserCoordinates.getLongitude();
+        String forecastURL = "https://api.forecast.io/forecast/" + API_KEY + "/" + mUserCoordinates.getLatitude() + "," + mUserCoordinates.getLongitude();
         if (isNetworkAvailable()) {
             toggleRefresh();
             OkHttpClient client = new OkHttpClient();
@@ -158,7 +166,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void toggleRefresh() {
-        if (mProgressBar.getVisibility() == View.INVISIBLE){
+        if (mProgressBar.getVisibility() == View.INVISIBLE) {
             mProgressBar.setVisibility(View.VISIBLE);
             mRefreshImageView.setVisibility(View.INVISIBLE);
         } else {
@@ -215,7 +223,7 @@ public class MainActivity extends AppCompatActivity implements
         return hours;
     }
 
-    private Day[] getDailyForecast(String jsonData) throws JSONException{
+    private Day[] getDailyForecast(String jsonData) throws JSONException {
         JSONObject forecast = new JSONObject(jsonData);
         String timezone = forecast.getString("timezone");
         JSONObject daily = forecast.getJSONObject("daily");
@@ -259,9 +267,12 @@ public class MainActivity extends AppCompatActivity implements
 
     private boolean isNetworkAvailable() {
         ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo mNetworkInfo = manager.getActiveNetworkInfo();
+        NetworkInfo mNetworkInfo = null;
+        if (manager != null) {
+            mNetworkInfo = manager.getActiveNetworkInfo();
+        }
         boolean isAvailable = false;
-        if (mNetworkInfo != null && mNetworkInfo.isConnected()){
+        if (mNetworkInfo != null && mNetworkInfo.isConnected()) {
             isAvailable = true;
         }
         return isAvailable;
@@ -269,10 +280,10 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onConnected(Bundle bundle) {
-        Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        Location lastLocation = FusedLocationApi.getLastLocation(mGoogleApiClient);
 
-        if(lastLocation != null){
-            mUserCoordinates.setLatiude(lastLocation.getLatitude());
+        if (lastLocation != null) {
+            mUserCoordinates.setLatitude(lastLocation.getLatitude());
             mUserCoordinates.setLongitude(lastLocation.getLongitude());
             getForecast();
         } else {
@@ -287,7 +298,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-        Toast.makeText(this,"Connection failed: "+ connectionResult.getErrorCode(), Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "Connection failed: " + connectionResult.getErrorCode(), Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -305,17 +316,17 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    @OnClick (R.id.dailyButton)
-    public void startDailyForecastActivity(View view){
+    @OnClick(R.id.dailyButton)
+    public void startDailyForecastActivity(View view) {
         Intent intent = new Intent(this, DailyForecastActivity.class);
-        intent.putExtra(DAILY_FORECAST,mForecast.getDailyForecast());
+        intent.putExtra(DAILY_FORECAST, mForecast.getDailyForecast());
         startActivity(intent);
     }
 
-    @OnClick (R.id.hourlyButton)
-    public void startHourlyForecastActivity(View view){
+    @OnClick(R.id.hourlyButton)
+    public void startHourlyForecastActivity(View view) {
         Intent intent = new Intent(this, HourlyForecastActivity.class);
-        intent.putExtra(HOURLY_FORECAST,mForecast.getHourlyForecast());
+        intent.putExtra(HOURLY_FORECAST, mForecast.getHourlyForecast());
         startActivity(intent);
     }
 }

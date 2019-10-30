@@ -1,13 +1,15 @@
 package me.fahadalrabbani.kaipos.adapters;
 
 import android.content.Context;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 import me.fahadalrabbani.kaipos.R;
 import me.fahadalrabbani.kaipos.weather.Hour;
@@ -26,11 +28,10 @@ public class HourAdapter extends RecyclerView.Adapter<HourAdapter.HourViewHolder
         mHours = hours;
     }
 
+    @NonNull
     @Override
     public HourViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
-        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.hourly_list_item,viewGroup,false);
-        HourViewHolder viewHolder = new HourViewHolder(view);
-        return viewHolder;
+        return new HourViewHolder(LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.hourly_list_item,viewGroup,false));
     }
 
     @Override
@@ -51,7 +52,7 @@ public class HourAdapter extends RecyclerView.Adapter<HourAdapter.HourViewHolder
         TextView mTemperatureLabel;
         ImageView mIconImageView;
 
-        public HourViewHolder(View itemView) {
+        HourViewHolder(View itemView) {
             super(itemView);
             mTimeLabel = (TextView) itemView.findViewById(R.id.timeLabel2);
             mSummaryLabel = (TextView) itemView.findViewById(R.id.summaryLabel2);
@@ -61,7 +62,7 @@ public class HourAdapter extends RecyclerView.Adapter<HourAdapter.HourViewHolder
             itemView.setOnClickListener(this);
         }
 
-        public void bindHour(Hour hour){
+        void bindHour(Hour hour){
             mTimeLabel.setText(hour.getHour());
             mSummaryLabel.setText(hour.getSummary());
             mTemperatureLabel.setText(String.format("%s˚", String.valueOf(hour.getTemperature())));

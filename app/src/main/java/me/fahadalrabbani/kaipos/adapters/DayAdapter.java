@@ -8,6 +8,8 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.Locale;
+
 import me.fahadalrabbani.kaipos.R;
 import me.fahadalrabbani.kaipos.weather.Day;
 
@@ -58,7 +60,7 @@ public class DayAdapter  extends BaseAdapter {
         Day day = mDays[position];
 
         holder.iconImageView.setImageResource(day.getIconId());
-        holder.temperatureLabel.setText(String.format("%d", day.getTemperatureMax()));
+        holder.temperatureLabel.setText(String.format(Locale.ENGLISH,"%d", day.getTemperatureMax()));
         if (position == 0){
             holder.dayLabel.setText(R.string.day_today);
         } else if(position == 1) {
