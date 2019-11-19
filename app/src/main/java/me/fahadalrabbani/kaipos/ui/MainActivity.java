@@ -21,7 +21,9 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
+import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.squareup.okhttp.Call;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.OkHttpClient;
@@ -33,6 +35,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -83,7 +86,17 @@ public class MainActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         buildGoogleApiClient();
-
+        FusedLocationProviderClient mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        mFusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+                if (location != null) {
+                    mUserCoordinates.setLatitude(location.getLatitude());
+                    mUserCoordinates.setLongitude(location.getLongitude());
+                    getForecast();
+                }
+            }
+        });
         mProgressBar.setVisibility(View.INVISIBLE);
 
         mRefreshImageView.setOnClickListener(new View.OnClickListener() {
@@ -103,7 +116,6 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void getForecast() {
-
         String API_KEY = "0f5adca66a91f9e4181805b9c68dae22";
         String forecastURL = "https://api.forecast.io/forecast/" + API_KEY + "/" + mUserCoordinates.getLatitude() + "," + mUserCoordinates.getLongitude();
         if (isNetworkAvailable()) {
@@ -178,10 +190,10 @@ public class MainActivity extends AppCompatActivity implements
     private void updateDisplay() {
         Current mCurrent = mForecast.getCurrent();
 
-        mTemperatureLabel.setText(String.format("%d", mCurrent.getTemperature()));
+        mTemperatureLabel.setText(String.format(Locale.ENGLISH, "%d", mCurrent.getTemperature()));
         mTimeLabel.setText(String.format("At %s it will be", mCurrent.getFormattedTime()));
-        mHumidityValue.setText(String.format("%s", mCurrent.getHumidity()));
-        mPrecipValue.setText(String.format("%d%%", mCurrent.getPrecipChance()));
+        mHumidityValue.setText(String.format(Locale.ENGLISH, "%s", mCurrent.getHumidity()));
+        mPrecipValue.setText(String.format(Locale.ENGLISH, "%d%%", mCurrent.getPrecipChance()));
         mSummaryLabel.setText(mCurrent.getSummary());
         //Drawable drawable = getResources().getDrawable(mCurrent.getIconId());
         Drawable drawable = ResourcesCompat.getDrawable(getResources(), mCurrent.getIconId(), null);
@@ -193,13 +205,13 @@ public class MainActivity extends AppCompatActivity implements
         Forecast forecast = new Forecast();
 
         forecast.setCurrent(getCurrentDetails(jsonData));
-        forecast.setHourlyForecast(getHouryForecast(jsonData));
+        forecast.setHourlyForecast(getHourlyForecast(jsonData));
         forecast.setDailyForecast(getDailyForecast(jsonData));
 
         return forecast;
     }
 
-    private Hour[] getHouryForecast(String jsonData) throws JSONException {
+    private Hour[] getHourlyForecast(String jsonData) throws JSONException {
         JSONObject forecast = new JSONObject(jsonData);
         String timezone = forecast.getString("timezone");
         JSONObject hourly = forecast.getJSONObject("hourly");
